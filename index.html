@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1E90FF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Switchr — Transfert intelligent de donnees entre telephones + echange de contacts par QR avec permissions par categorie." />
+
+  <title>Switchr</title>
+
+  <link rel="icon" type="image/png" href="/icons/logo.png" />
+
+  <!-- Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root, #root * {
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    }
+    html, body {
+      background: #FFFFFF;
+      color: #0F1620;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { outline: none; cursor: pointer; }
+    :focus-visible { outline: 2px solid #1E90FF; outline-offset: 2px; }
+
+    /* Splash */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, #1E90FF, #0B5ED7);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 24px;
+      transition: opacity 0.5s ease;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash img { width: 96px; height: auto; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.25)); }
+    #splash .title { color: #FFF; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    #splash .tag { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <img src="/icons/logo.png" alt="Switchr" />
+    <div class="title">Switchr</div>
+    <div class="tag">Ton telephone, tes regles.</div>
+  </div>
+
+  <div id="root"></div>
+
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

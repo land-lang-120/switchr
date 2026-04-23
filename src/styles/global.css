@@ -1,0 +1,85 @@
+/* Switchr — Styles globaux + tokens */
+
+:root {
+  /* Brand */
+  --sw-primary: #1E90FF;
+  --sw-primary-dark: #0B5ED7;
+  --sw-primary-soft: #D6EAFF;
+  --sw-primary-softer: #EFF6FF;
+
+  /* Surfaces */
+  --sw-bg: #FFFFFF;
+  --sw-surface: #F8FAFC;
+  --sw-surface-2: #EEF2F6;
+  --sw-line: #E3E8EE;
+  --sw-title: #0F1620;
+  --sw-body: #2A2F38;
+  --sw-sub: #5B6472;
+  --sw-muted: #8B96A6;
+
+  /* Status */
+  --sw-danger: #FF4757;
+  --sw-warning: #FFB740;
+  --sw-success: #21B573;
+
+  /* Radii */
+  --sw-r-sm: 10px;
+  --sw-r-md: 14px;
+  --sw-r-lg: 20px;
+  --sw-r-xl: 28px;
+}
+
+[data-theme='dark'] {
+  --sw-bg: #0A0E14;
+  --sw-surface: #111723;
+  --sw-surface-2: #1A2230;
+  --sw-line: #222A36;
+  --sw-title: #F1F5F9;
+  --sw-body: #D6DCE3;
+  --sw-sub: #8B96A6;
+  --sw-muted: #5B6472;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root, #root * {
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html, body {
+  background: var(--sw-bg);
+  color: var(--sw-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+button { outline: none; cursor: pointer; }
+button:active { transform: scale(0.98); }
+input, select, textarea { font-size: 16px; font-family: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--sw-primary);
+  outline-offset: 2px;
+}
+
+/* Scrollbar cachee */
+.sw-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sw-scroll-x::-webkit-scrollbar {
+  display: none;
+}
