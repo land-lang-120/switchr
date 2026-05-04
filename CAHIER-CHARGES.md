@@ -9,12 +9,59 @@
 | **Nom** | Switchr |
 | **Identifiant technique** | `switchr` |
 | **Version cible** | 1.0.0 |
-| **Type** | Transfert de donnees + echange intelligent de contacts |
+| **Type** | Transfert de donnees + echange intelligent de contacts + cloud backup |
 | **Plateformes** | PWA Web + Android (TWA/Capacitor) + iOS |
 | **Langues** | fr, en, es, pt, de, it, ar, zh (8 au minimum) |
 | **Décideur produit** | Pino |
-| **Dernière mise à jour** | 2026-04-20 |
-| **Statut** | 🟠 Dev (greenfield) |
+| **Dernière mise à jour** | 2026-05-04 (snapshot post-audit, 4 écrans visuels confirmés) |
+| **Statut** | 🟠 Dev — UI shell OK, logique business à compléter |
+| **Repo** | `github.com/land-lang-120/switchr` |
+| **Pricing** | Free + Plus (à définir) + Pro **max $2.99/mois** |
+
+---
+
+## 📊 Snapshot 2026-05-04 — où on en est
+
+### ✅ Confirmé en visuel (Puppeteer screenshots)
+
+| Écran | Statut | Notes |
+|---|---|---|
+| **Welcome** | ✅ Render OK | Logo bleu + pitch + 2 CTA (Creer compte / J'ai déjà compte) |
+| **Signup** | ✅ Render OK | 3 champs : Nom complet, Email, Mot de passe (hint "8+ car, 1 maj, 1 chiffre") |
+| **Login** | ✅ Render OK | "Bon retour" + Nom + Mot de passe + bouton "Se connecter" |
+| **Home** | ⚠️ Pas encore screenshot | À atteindre via signup réel |
+| **Profile** | ⚠️ Pas encore screenshot | Idem |
+| **Exchange** | ⚠️ Pas encore screenshot | Idem |
+
+### 🐛 Bugs détectés et fixés
+
+| # | Bug | Statut | Solution |
+|---|---|---|---|
+| **BUG-SW-1** | Splash HTML `#splash` (z-index 9999) jamais retiré au mount React → cache l'app à jamais | ✅ FIXÉ | `requestAnimationFrame` dans main.tsx → `splash.classList.add('hide')` + remove après 600ms |
+
+### 🐛 Bugs en cours de validation
+
+| # | Sujet | À valider Pino |
+|---|---|---|
+| **BUG-SW-2?** | Pas de champ "Confirmer le mot de passe" (3 champs au lieu de 4) | Ajouter ? Évite les typos password mais alourdit le form |
+| **BUG-SW-3?** | Pas de validation password en live (pas d'indicateur visuel ✅/❌ sur "8+ car, 1 maj, 1 chiffre") | Ajouter une checklist dynamique pendant la frappe ? |
+
+### 📋 À valider techniquement (audit fonctionnel à faire)
+
+- [ ] Signup réel : crée bien un user dans `localStorage[switchr_users]` avec PBKDF2 hash ?
+- [ ] Login réel : matche bien le hash via timing-safe comparison ?
+- [ ] Génération QR : produit un QR scannable par d'autres apps QR ?
+- [ ] Scanner QR : composant CameraScanner existe-t-il ? (pas implémenté à confirmer)
+- [ ] Permissions par catégorie : UI checkbox + filtrage côté envoi du QR ?
+- [ ] Transfert intégral : code de TransferChannel (WebRTC ou Firebase) ?
+
+### 🧪 Approche test-driven (consigne Pino)
+
+Pino veut un travail minutieux avec micro-tests pour CHAQUE morceau de code :
+- **Vitest** : déjà installé, à utiliser pour chaque fonction critique (`utils/crypto.ts`, `services/auth.ts`, parsing QR, etc.)
+- **Playwright** : déjà installé, à utiliser pour les flows E2E (signup → home → exchange → ...)
+- **Puppeteer screenshots** : déjà en place (`screenshot-screens.mjs`) pour validation visuelle régressive
+- **Règle senior** : aucune nouvelle feature mergée sans au minimum 1 test unitaire + validation visuelle
 
 ---
 
@@ -97,6 +144,70 @@
 | F8 | Liste des contacts reçus | Chaque contact scanné est sauvegardé avec la catégorie | Free | 🔴 P0 |
 | F9 | Plans Premium | Free / Plus / Pro | — | 🔴 P0 |
 | F10 | Settings + Logout + Suppression compte | RGPD compliant | Free | 🔴 P0 |
+
+### 3.1bis 🆕 Cloud Backup — feature ajoutée 2026-05-04
+
+> **Décision Pino** : ajouter le stockage en ligne payant pour récupérer ses
+> données quand le téléphone précédent est perdu/cassé/volé (cas où le
+> transfert direct par QR est impossible).
+
+#### Mécanique
+
+| Aspect | Détail |
+|---|---|
+| **But** | Backup chiffré des contacts + médias dans le cloud, lié au compte Switchr (récupération depuis n'importe quel device après login) |
+| **Quand on l'utilise** | Téléphone perdu/cassé/volé → le transfert direct via QR n'est plus possible → l'utilisateur se logue sur un nouveau device et restaure depuis le cloud |
+| **Chiffrement** | E2E avec une clé dérivée du password user (PBKDF2) — le serveur ne peut PAS lire les données, juste les stocker |
+| **Backend** | Firebase Storage (chiffré côté client AVANT upload) + Firestore pour les métadonnées (manifeste de backup) |
+| **Sync auto** | Optionnel — toutes les 24h en background si Pro, manuel sinon |
+| **Quotas** | Free : pas de cloud backup. Plus : 1 GB. Pro : 50 GB. |
+| **Pricing** | **Max $2.99 / mois** (impératif Pino, pas plus). Suggéré : Plus = $0.99/mois OR offrir avec ads, Pro = $2.99/mois full features |
+| **Forfait annuel** | Réduction = $2.99 × 10 mois facturé annuellement = **$29.90/an** (équivaut 10 mois au lieu de 12 → 17% off). Limite max stricte respectée. |
+
+#### Plans actualisés
+
+| Plan | Prix | Cloud Backup | Permissions | QR catégoriel | Transfert direct | Boosters/extras |
+|---|---|---|---|---|---|---|
+| **Free** | 0$ | ❌ aucun | Basique (numéros seul) | ✅ | Limité (50 contacts max) | 1 catégorie |
+| **Plus** | $0.99/mois | 1 GB | Avancé (tous champs) | ✅ | Illimité | 4 catégories + thèmes |
+| **Pro** | **$2.99/mois** | **50 GB** | Avancé + custom | ✅ | Illimité (médias inclus) | Tout débloqué + sync auto |
+| **Pro annuel** | $29.90/an | Idem Pro | — | — | — | -17% vs mensuel |
+
+#### Restauration (flow utilisateur)
+
+```
+[Téléphone perdu] → l'utilisateur achète/utilise un nouveau téléphone
+   ↓
+1. Installe Switchr → Login avec email+password (le même qu'avant)
+   ↓
+2. Switchr détecte qu'un backup cloud existe pour ce compte
+   ↓
+3. Affiche : "💾 Backup trouvé du <date>, X contacts + Y Go médias. Restaurer ?"
+   ↓
+4. User confirme → Switchr télécharge depuis Firebase Storage
+   ↓
+5. Déchiffrement local avec la clé PBKDF2 du password
+   ↓
+6. Contacts + médias restaurés dans le téléphone
+```
+
+#### Sécurité critique
+
+- ⚠️ **Le password n'est JAMAIS envoyé au serveur** — Firebase Auth utilise un autre flow (email link OU password hash via Firebase, mais notre clé de déchiffrement est dérivée localement).
+- ⚠️ **Si user oublie son password → données perdues** (Firebase ne peut pas déchiffrer). Mention claire dans les CGU + warning lors de l'activation.
+- ⚠️ **Authentification 2FA recommandée** pour les comptes Pro (TOTP).
+
+#### À implémenter
+
+| # | Composant | Fichier | Tests |
+|---|---|---|---|
+| F30 | `services/cloud-backup.ts` | API : `enableBackup()`, `triggerBackup()`, `listBackups()`, `restoreFromBackup()` | Vitest unitaires |
+| F31 | `utils/encrypt-blob.ts` | AES-GCM chunk encryption pour gros médias | Vitest avec fixtures |
+| F32 | `features/backup/BackupSettingsScreen.tsx` | UI activation + quotas + dernière sync | Playwright E2E |
+| F33 | `features/backup/RestoreScreen.tsx` | UI restauration au login | Playwright E2E |
+| F34 | `services/billing.ts` | Stripe / Google Play / StoreKit wrappers | Manual test (sandbox) |
+
+---
 
 ### 3.2 v1.1 (1-2 mois post-lancement) — P1
 

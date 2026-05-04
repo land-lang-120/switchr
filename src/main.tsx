@@ -19,3 +19,13 @@ createRoot(rootEl).render(
     <App />
   </React.StrictMode>,
 );
+
+// Hide splash screen once React has mounted (next animation frame)
+// — sinon le splash z-index:9999 cache l'app à jamais.
+requestAnimationFrame(() => {
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 600); // après transition opacity
+  }
+});
